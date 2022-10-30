@@ -1,0 +1,27 @@
+### Create pdfs
+POST http://localhost:3000/create?height=480&width=480
+Content-Type: application/json
+
+{
+  "content": "<h1>Ege</h1><p>Erdal</p><h3>123</h3>"
+}
+
+
+###
+GET http://localhost:3000/all
+
+### 
+GET http://localhost:3000/download
+Content-Type: application/json
+
+{
+  "id":"5"
+}
+
+### 
+GET http://localhost:3000/delete
+Content-Type: application/json
+
+{
+  "id":"7"
+}
