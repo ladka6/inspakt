@@ -2,10 +2,14 @@ import {
   Body,
   Controller,
   Get,
+  Headers,
+  HttpException,
+  HttpStatus,
   Param,
   Post,
   Res,
   StreamableFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { createReadStream } from 'fs';
 import { join } from 'path';
@@ -18,9 +22,25 @@ const htmltopdf = require('html-pdf-node');
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
+  @Post('/generateapi')
+  generateApi(@Body() body: any) {
+    const key = this.appService.createApi(body.key);
+    return key;
+  }
+
   @Post('/create')
-  async create(@Body() body: any, @Param() params: any) {
-    const document = await this.appService.create();
+  async create(
+    @Body() body: any,
+    @Param() params: any,
+    @Headers() headers: any,
+  ) {
+    const validate = await this.appService.validateApi(headers.auth);
+    if (!validate) throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+    const document = await this.appService.createPdf(
+      body.content,
+      __dirname + '/../src/pdfs/',
+      headers.auth,
+    );
     const options = {
       format: 'A4',
       width: params.width,
@@ -34,26 +54,12 @@ export class AppController {
         pdfBuffer,
         (err) => {
           if (err) throw err;
-          console.log('Done');
+          console.log('done');
         },
       );
     });
     return document.id;
   }
-
-  // @Get('/all')
-  // async findAll() {
-  //   const documents = await this.appService.findAll();
-  //   const files: StreamableFile[] = [];
-  //   for (var i = 0; i < documents.length; i++) {
-  //     const file = createReadStream(
-  //       join(process.cwd(), `/src/pdfs/${documents[i].id}.pdf`),
-  //     );
-  //     files.push(new StreamableFile(file));
-  //   }
-  //   return files;
-  // }
-
   @Get('/all')
   async findAll() {
     const documents = await this.appService.findAll();
@@ -90,3 +96,16 @@ export class AppController {
     return new StreamableFile(file);
   }
 }
+
+//   // @Get('/all')
+//   // async findAll() {
+//   //   const documents = await this.appService.findAll();
+//   //   const files: StreamableFile[] = [];
+//   //   for (var i = 0; i < documents.length; i++) {
+//   //     const file = createReadStream(
+//   //       join(process.cwd(), `/src/pdfs/${documents[i].id}.pdf`),
+//   //     );
+//   //     files.push(new StreamableFile(file));
+//   //   }
+//   //   return files;
+//   // }

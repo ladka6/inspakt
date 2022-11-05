@@ -3,9 +3,17 @@ POST http://localhost:3000/create?height=480&width=480
 Content-Type: application/json
 
 {
-  "content": "<h1>Ege</h1><p>Erdal</p><h3>123</h3>"
+  "content": "<table><tr><th>Company</th><th>Contact</th><th>Country</th></tr><tr><td>Alfreds Futterkiste</td><td>Maria Anders</td><td>Germany</td></tr><tr><td>Centro comercial Moctezuma</td><td>Francisco Chang</td><td>Mexico</td></tr></table>"
 }
 
+
+###
+POST http://localhost:3000/generateapi
+Content-Type: application/json
+
+{
+  "key": "f0104ed7-4312-4248-8aac-54e3fdd7d664"
+}
 
 ###
 GET http://localhost:3000/all
